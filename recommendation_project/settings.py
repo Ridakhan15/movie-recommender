@@ -15,11 +15,14 @@ USE_POSTGRES = os.environ.get('USE_POSTGRES', 'False') == 'True'
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key-change-in-production')
 # settings.py (only the relevant part)
 
-DEBUG = True          # keep True while debugging locally
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    'movie-recommender-9p0a.onrender.com',      # <‑‑ add this
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+# For production, you might want to add CSRF trusted origins
+CSRF_TRUSTED_ORIGINS = [
+    'https://movie-recommender-9p0a.onrender.com',
+    'https://movie-recommender-1-2baz.onrender.com',
+    '.onrender.com',  # This allows ANY Render subdomain
+
 ]
 
 MIDDLEWARE = [
