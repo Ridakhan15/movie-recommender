@@ -44,15 +44,7 @@ A sophisticated movie recommendation system that combines multiple machine learn
 - Similar movies suggestions
 - Watchlist functionality
 - Genre-based exploration
-- 
-
-###📊 Algorithm Performance Comparison
-Algorithm	CTR	Conversion Rate	Avg Rating	Users
-Hybrid	18.5%	12.3%	4.2/5	150
-SVD	15.2%	10.1%	4.0/5	120
-Collaborative	12.8%	8.7%	3.9/5	130
-Content-Based	10.3%	7.2%	3.8/5	110
-
+  
 ## 🏗️ System Architecture
 
 ```mermaid
