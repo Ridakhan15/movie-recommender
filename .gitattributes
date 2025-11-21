@@ -1,0 +1,9 @@
+# .gitattributes
+# Tell Git to always store files as LF in the repo.
+# This prevents the warning for every file.
+*
+text eol=lf
+
+# Optional: keep binary files unchanged
+*.bak   binary
+*.dir   binary

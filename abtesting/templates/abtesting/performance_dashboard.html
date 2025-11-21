@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Algorithm Performance Dashboard</title>
+</head>
+<body>
+    <h1>Recommendation Algorithm Performance Comparison</h1>
+    
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Algorithm</th>
+                <th>Avg Rating</th>
+                <th>Avg Response Time</th>
+                <th>Avg Diversity</th>
+                <th>Test Users</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for algo, stats in algorithm_stats.items %}
+            <tr>
+                <td>{{ algo|title }}</td>
+                <td>{{ stats.avg_rating|default:"0.0" }}</td>
+                <td>{{ stats.avg_time|default:"0.0" }}s</td>
+                <td>{{ stats.avg_diversity|default:"0.0" }}</td>
+                <td>{{ stats.total_users|default:"0" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
