@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Users</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0B1E3F, #9F6BFF);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Full-width white box */
+        .container {
+            width: 90%;
+            margin: 40px auto; /* center horizontally */
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.2);
+        }
+
+        h2 {
+            margin-bottom: 25px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        /* Each user entry */
+        .user-card {
+            background: #f3f3ff;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-name {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .view-profile-btn {
+            text-decoration: none;
+            background: #6A85FF;
+            padding: 10px 16px;
+            color: white;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .view-profile-btn:hover {
+            background: #5569ff;
+        }
+
+        .no-results {
+            font-size: 18px;
+            color: #333;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Search Users</h2>
+
+    <form method="get">
+        <input type="text" name="q" placeholder="Search by username…" value="{{ query }}">
+    </form>
+
+    {% if results %}
+        {% for user in results %}
+            <div class="user-card">
+                <div class="user-name">{{ user.username }}</div>
+                <a class="view-profile-btn" href="/profile/{{ user.id }}/">View</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="no-results">No users found.</p>
+    {% endif %}
+</div>
+
+</body>
+</html>

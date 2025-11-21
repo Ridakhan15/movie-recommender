@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ profile_user.username }}'s Profile - Movie Recommender</title>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0B1E3F  0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            background: #fff;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+            margin-bottom: 25px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            padding-bottom: 35px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            font-size: 3.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-info h1 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .bio {
+            color: #666;
+            margin-top: 6px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 25px;
+            margin-top: 18px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        /* Follow Button */
+        .follow-btn {
+            padding: 12px 28px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .follow-btn.following {
+            background: #e9ecef;
+            color: #555;
+        }
+
+        .follow-btn.not-following {
+            background: #667eea;
+            color: white;
+        }
+
+        .follow-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Sections */
+        .section {
+            margin-top: 45px;
+        }
+
+        .section h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.6rem;
+        }
+
+        /* Genres */
+        .genre-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .genre-tag {
+            background: #667eea;
+            color: white;
+            padding: 7px 18px;
+            border-radius: 20px;
+        }
+
+        /* Ratings */
+        .ratings-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .rating-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            justify-content: space-between;
+            transition: 0.3s;
+        }
+
+        .rating-card:hover {
+            transform: translateX(6px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .rating-info h3 {
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .rating-info p {
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        .rating-stars {
+            font-size: 1.4rem;
+            color: #ffc107;
+        }
+    </style>
+
+</head>
+
+<body>
+<div class="container">
+
+    <a href="{% url 'dashboard' %}" class="back-link">← Back to Dashboard</a>
+
+    <!-- PROFILE HEADER -->
+    <div class="profile-header">
+
+        <div class="avatar">
+            {{ profile_user.username|slice:":1"|upper }}
+        </div>
+
+        <div class="profile-info">
+            <h1>{{ profile_user.username }}</h1>
+
+            {% if profile.bio %}
+                <p class="bio">{{ profile.bio }}</p>
+            {% endif %}
+
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <div class="stat-number">{{movies_rated_count }}</div>
+                    <div class="stat-label">Movies Rated</div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-number">{{ follower_count }}</div>
+                    <div class="stat-label">Followers</div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-number">{{ following_count }}</div>
+                    <div class="stat-label">Following</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOLLOW BUTTON -->
+        {% if not is_own_profile %}
+            <form action="{% url 'follow_user' profile_user.id %}" method="post">
+                {% csrf_token %}
+                {% if is_following %}
+                    <button type="submit" class="follow-btn following">Following</button>
+                {% else %}
+                    <button type="submit" class="follow-btn not-following">Follow</button>
+                {% endif %}
+            </form>
+        {% endif %}
+
+    </div>
+
+
+    <!-- FAVORITE GENRES -->
+    {% if top_genres %}
+        <div class="section">
+            <h2>Favorite Genres</h2>
+            <div class="genre-tags">
+                {% for genre, count in top_genres %}
+                    <span class="genre-tag">{{ genre }} ({{ count }})</span>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+
+    <!-- RECENT RATINGS -->
+    <div class="section">
+        <h2>Recent Ratings</h2>
+        <div class="ratings-grid">
+            {% for rating in user_ratings %}
+                <div class="rating-card">
+                    <div class="rating-info">
+                        <h3>{{ rating.movie.title }}</h3>
+                        <p>{{ rating.movie.genres }} • {{ rating.timestamp|timesince }} ago</p>
+                    </div>
+                    <div class="rating-stars">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= rating.rating %}★{% else %}☆{% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% empty %}
+                <p style="color: #777;">No ratings yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

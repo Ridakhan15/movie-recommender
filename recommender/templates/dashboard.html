@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommender - Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(#000000, #0B1E3F 0%, #9F6BFF 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        h1 {
+            color: #0B1E3F;
+            font-size: 2em;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Profile button */
+        .btn-profile {
+            padding: 10px 20px;
+            background-color: #D2042D;
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .btn-profile:hover {
+            background-color: #8B0000;
+            transform: scale(1.05);
+        }
+
+        /* Logout button */
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .logout-btn:hover {
+            background: #b91f2b;
+            transform: scale(1.05);
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #222;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        /* Search */
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+        }
+
+        .search-box button {
+            background: #FFFF8F;
+            color: black;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .search-box button:hover {
+            background: #FAFA33;
+        }
+
+        /* Movie cards */
+        .movie-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .movie-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+        }
+
+        .movie-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .movie-card p {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        /* Rating stars */
+        .rating-form {
+            display: flex;
+            gap: 5px;
+        }
+
+        .rating-form input[type="radio"] {
+            display: none;
+        }
+
+        .rating-form label {
+            cursor: pointer;
+            font-size: 1.5em;
+            color: #ddd;
+        }
+
+        .rating-form input[type="radio"]:checked ~ label {
+            color: #ffc107;
+        }
+
+        .rating-form label:hover,
+        .rating-form label:hover ~ label {
+            color: #ffc107;
+        }
+
+        .submit-rating {
+            margin-top: 10px;
+            background: #28a745;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .submit-rating:hover {
+            background: #218838;
+        }
+
+        /* Recommendations */
+        .recommendations-container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .load-recommendations {
+            background: #FFFF8F;
+            color: #0B1E3F;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .load-recommendations:hover {
+            background: #FAFA33;
+        }
+
+        .recommendation-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        /* Ratings history */
+        .rating-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stars {
+            color: #ffc107;
+            font-size: 1.2em;
+        }
+
+        /* Social feed */
+        .social-feed {
+            display: grid;
+            gap: 15px;
+        }
+
+        .social-feed-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .feed-movie a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .shared-rec-item {
+            background: #fff9e6;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .rec-message {
+            font-style: italic;
+            color: #666;
+            margin-top: 10px;
+        }
+        .btn-search-users {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 10px 18px;
+            background: #FFFF8F; /* deep navy to match theme */
+            color: black;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.25s ease-in-out;
+       }
+
+        .btn-search-users:hover {
+            background: #FAFA33	; /* slightly lighter when hovered */
+            transform: translateY(-2px);
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- Header -->
+        <header>
+            <h1>🎬 Movie Recommender</h1>
+            <div class="user-info">
+                <span>Welcome, <strong>{{ user.username }}</strong>!</span>
+                <a href="{% url 'profile' user.id %}" class="btn-profile">My Profile</a>
+                <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+            </div>
+        </header>
+
+        <!-- Your Ratings -->
+        <div class="section">
+            <h2>Your Ratings ({{ user_ratings.count }})</h2>
+
+            {% if user_ratings %}
+                {% for rating in user_ratings|slice:":10" %}
+                    <div class="rating-item">
+                        <div>
+                            <strong>{{ rating.movie.title }}</strong>
+                            <span style="color:#666; font-size:0.9em;">| {{ rating.movie.genres }}</span>
+                        </div>
+
+                        <div class="stars">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= rating.rating %}★{% else %}☆{% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p style="color:#666;">You haven't rated any movies yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Recommendations -->
+        <div class="section">
+            <h2>Your Personalized Recommendations</h2>
+            <button class="load-recommendations" onclick="loadRecommendations()">Get Recommendations</button>
+
+            <div id="recommendations" class="recommendations-container" style="display:none;">
+                <div class="loading">Loading recommendations...</div>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <div class="section">
+            <h2>Search & Rate Movies</h2>
+
+            <form method="GET" class="search-box">
+                <input type="text" name="search" placeholder="Search for movies…" value="{{ search_query }}">
+                <button type="submit">Search</button>
+            </form>
+
+            {% if search_query %}
+                <div class="movie-list">
+                    {% for movie in movies %}
+                        <div class="movie-card">
+                            <h3>{{ movie.title }}</h3>
+                            <p><strong>ID:</strong> {{ movie.movie_id }} | <strong>Genres:</strong> {{ movie.genres }}</p>
+
+                            <form method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="movie_id" value="{{ movie.movie_id }}">
+
+                                <div class="rating-form">
+                                    {% for num in "54321" %}
+                                        <input type="radio" name="rating" id="star{{ num }}-{{ movie.movie_id }}" value="{{ num }}">
+                                        <label for="star{{ num }}-{{ movie.movie_id }}">★</label>
+                                    {% endfor %}
+                                </div>
+
+                                <button class="submit-rating">Rate Movie</button>
+                            </form>
+                        </div>
+                    {% empty %}
+                        <p>No movies found.</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Friends Activity -->
+        <div class="section">
+            <h2>Friends' Activity</h2>
+
+            {% if social_feed %}
+                <div class="social-feed">
+                    {% for rating in social_feed %}
+                        <div class="social-feed-item">
+                            <div><strong>{{ rating.user.username }}</strong> rated</div>
+
+                            <div class="feed-movie">
+                                <a href="{% url 'movie_detail' rating.movie.movie_id %}">{{ rating.movie.title }}</a>
+                            </div>
+
+                            <div class="feed-rating">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= rating.rating %}★{% else %}☆{% endif %}
+                                {% endfor %}
+                            </div>
+
+                            <div class="feed-time">{{ rating.timestamp|timesince }} ago</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>Follow users to see their activity.</p>
+                <a href="{% url 'search_users' %}" class="btn-search-users">
+                    Search Users
+                </a>
+
+            {% endif %}
+        </div>
+
+        <!-- Shared Recommendations -->
+        {% if shared_recs %}
+        <div class="section">
+            <h2>Shared Recommendations</h2>
+
+            <div class="shared-recs">
+                {% for rec in shared_recs %}
+                    <div class="shared-rec-item">
+                        <p><strong>{{ rec.sender.username }}</strong> recommended:</p>
+
+                        <h4>
+                            <a href="{% url 'movie_detail' rec.movie.movie_id %}">
+                                {{ rec.movie.title }}
+                            </a>
+                        </h4>
+
+                        {% if rec.message %}
+                            <p class="rec-message">"{{ rec.message }}"</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        async function loadRecommendations() {
+            const container = document.getElementById('recommendations');
+            container.style.display = 'block';
+            container.innerHTML = '<div class="loading">Loading recommendations...</div>';
+
+            try {
+                const response = await fetch('/api/recommendations/', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin'
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    if (data.recommendations?.length) {
+                        let html = '<h3 style="margin-bottom:15px;">Recommended for you:</h3>';
+                        data.recommendations.forEach((movie, index) => {
+                            html += `
+                                <div class="recommendation-item">
+                                    <h4>${index + 1}. ${movie.title}</h4>
+                                    <p><strong>ID:</strong> ${movie.movie_id} | <strong>Genres:</strong> ${movie.genres}</p>
+                                </div>`;
+                        });
+                        container.innerHTML = html;
+                    } else {
+                        container.innerHTML = '<p style="color:#666;">Please rate more movies to get recommendations.</p>';
+                    }
+                } else {
+                    container.innerHTML = `<div class="error">${data.error || 'Could not load recommendations'}</div>`;
+                }
+
+            } catch (error) {
+                container.innerHTML = '<div class="error">Error loading recommendations. Try again.</div>';
+            }
+        }
+    </script>
+
+</body>
+</html>

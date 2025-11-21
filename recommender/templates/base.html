@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Movie Recommender{% endblock %}</title>
+
+    <!-- Link your static CSS -->
+    <link rel="stylesheet" href="/staticfiles/styles.css">
+
+    <!-- Inline page-specific styles -->
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    {% block content %}{% endblock %}
+</body>
+</html>

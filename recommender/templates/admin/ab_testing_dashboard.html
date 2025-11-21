@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A/B Testing Dashboard - Movie Recommender</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .experiments-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .experiments-table th,
+        .experiments-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .experiments-table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .experiments-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .metric-good {
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        .metric-medium {
+            color: #ffc107;
+            font-weight: 600;
+        }
+        
+        .metric-poor {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: #667eea;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{% url 'dashboard' %}" class="back-link">← Back to Dashboard</a>
+        
+        <h1>📊 A/B Testing Dashboard</h1>
+        
+        <p style="color: #666; margin-bottom: 30px;">
+            Performance comparison of different recommendation algorithms
+        </p>
+        
+        <table class="experiments-table">
+            <thead>
+                <tr>
+                    <th>Algorithm</th>
+                    <th>Users</th>
+                    <th>Click-Through Rate</th>
+                    <th>Conversion Rate</th>
+                    <th>Avg Rating Given</th>
+                    <th>Total Shown</th>
+                    <th>Total Clicked</th>
+                    <th>Total Rated</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exp in experiments %}
+                <tr>
+                    <td><strong>{{ exp.algorithm_variant|title }}</strong></td>
+                    <td>{{ exp.total_users }}</td>
+                    <td class="{% if exp.avg_ctr > 15 %}metric-good{% elif exp.avg_ctr > 8 %}metric-medium{% else %}metric-poor{% endif %}">
+                        {{ exp.avg_ctr|floatformat:2 }}%
+                    </td>
+                    <td class="{% if exp.avg_conversion > 10 %}metric-good{% elif exp.avg_conversion > 5 %}metric-medium{% else %}metric-poor{% endif %}">
+                        {{ exp.avg_conversion|floatformat:2 }}%
+                    </td>
+                    <td class="{% if exp.avg_rating > 4 %}metric-good{% elif exp.avg_rating > 3 %}metric-medium{% else %}metric-poor{% endif %}">
+                        {{ exp.avg_rating|floatformat:2 }}/5
+                    </td>
+                    <td>{{ exp.total_shown }}</td>
+                    <td>{{ exp.total_clicked }}</td>
+                    <td>{{ exp.total_rated }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" style="text-align: center; color: #999;">
+                        No experiment data yet. Data will appear as users interact with recommendations.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+            <h3 style="margin-bottom: 15px;">Metrics Explanation</h3>
+            <ul style="line-height: 2; color: #666;">
+                <li><strong>Click-Through Rate (CTR):</strong> Percentage of shown recommendations that were clicked</li>
+                <li><strong>Conversion Rate:</strong> Percentage of shown recommendations that were rated</li>
+                <li><strong>Avg Rating Given:</strong> Average rating users gave to recommended movies</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ----------------------------------------------------------- -->
+    <!-- JS: Track Recommendation Clicks (for testing/demo purposes) -->
+    <!-- ----------------------------------------------------------- -->
+    <script>
+    function onRecommendationClick(movieId, algorithm) {
+        fetch('/recommender/api/recommendations/click/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken') // Django CSRF token
+            },
+            body: JSON.stringify({ movie_id: movieId, algorithm: algorithm })
+        }).catch(err => console.error('Click tracking failed', err));
+    }
+
+    // Helper function to read CSRF cookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            let cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                let cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Example usage for testing:
+    // You can call onRecommendationClick(123, 'hybrid') when a recommended movie is clicked
+    </script>
+
+</body>
+</html>
