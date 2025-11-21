@@ -16,6 +16,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key-change-in-pro
 # settings.py (only the relevant part)
 
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+print("ALLOWED_HOSTS:", os.getenv('ALLOWED_HOSTS'))
+
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 # For production, you might want to add CSRF trusted origins
 CSRF_TRUSTED_ORIGINS = [
